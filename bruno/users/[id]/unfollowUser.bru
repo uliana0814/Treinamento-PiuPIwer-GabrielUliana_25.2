@@ -1,0 +1,15 @@
+meta {
+  name: Unfollow User
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/users/:id/follow
+  body: none
+  auth: none
+}
+
+params:path {
+  id: USER_ID_TO_UNFOLLOW
+}

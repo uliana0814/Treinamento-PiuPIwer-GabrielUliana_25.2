@@ -1,0 +1,15 @@
+meta {
+  name: Follow User
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/users/:id/follow
+  body: none
+  auth: none
+}
+
+params:path {
+  id: USER_ID_TO_FOLLOW
+}

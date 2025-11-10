@@ -1,0 +1,15 @@
+meta {
+  name: Get Post by ID
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/posts/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: POST_ID_HERE
+}

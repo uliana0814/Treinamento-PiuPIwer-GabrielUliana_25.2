@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+// modelos de exemplo abaixo (pode deletar)
+model Curso {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  descricao String
+  slug      String @unique
+
+  materiasRelacionadas CursoMateriaRelacionada[]
+}
+
+model CursoMateriaRelacionada {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+
+  curso   Curso  @relation(fields: [cursoId], references: [id])
+  cursoId String
+
+  materia   Materia @relation(fields: [materiaId], references: [id])
+  materiaId String
+
+  @@unique([cursoId, materiaId])
+}
+
+model Materia {
+  id                 String                    @id @default(uuid()) @map("_id")
+  name               String
+  descricao          String
+  cor                String
+  slug               String                    @unique
+  cursosRelacionados CursoMateriaRelacionada[]
+}
+
+model Licao {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId // id base do mongodb, + perfomance
+  name      String
+  descricao String
+  archived  Boolean? @default(false)
+}
+// modelos de exemplo acima (pode deletar)
+
+model User {
+  // nao mexer entre aqui >
+  id            String    @id @map("_id") // o id do user deve ser assim por causa do better auth
+  name          String
+  email         String    @unique
+  emailVerified Boolean?
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+  role          Role      @default(USER)
+  // < e aqui
+
+  // Social media fields
+  dateOfBirth   DateTime?
+  location      String?   // City
+
+  // Relations
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  followers     Follow[]  @relation("UserFollowers")
+  following     Follow[]  @relation("UserFollowing")
+
+  @@map("user")
+}
+
+model Post {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  text      String
+  imageUrl  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+
+  comments  Comment[]
+  likes     Like[]
+
+  @@map("post")
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String   @db.ObjectId
+
+  @@map("comment")
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String   @db.ObjectId
+
+  @@unique([userId, postId])
+  @@map("like")
+}
+
+model Follow {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+
+  following   User     @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+
+  @@unique([followerId, followingId])
+  @@map("follow")
+}
+
+
+
+
+
+// evitar mexer daqui pra baixo
+// nesses 3 modelos do better auth
+model Session {
+  id        String   @id @map("_id")
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @map("_id")
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @map("_id")
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get Followers
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/users/:id/follow?type=followers&page=1&limit=50
+  body: none
+  auth: none
+}
+
+params:path {
+  id: USER_ID_HERE
+}
+
+params:query {
+  type: followers
+  page: 1
+  limit: 50
+}

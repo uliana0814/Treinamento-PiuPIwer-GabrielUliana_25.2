@@ -1,0 +1,20 @@
+meta {
+  name: Get User Posts
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/users/:id/posts?page=1&limit=20
+  body: none
+  auth: none
+}
+
+params:path {
+  id: USER_ID_HERE
+}
+
+params:query {
+  page: 1
+  limit: 20
+}
