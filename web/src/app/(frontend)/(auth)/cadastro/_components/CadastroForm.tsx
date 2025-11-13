@@ -1,22 +1,22 @@
 'use client'
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import PasswordRequirement from "./PasswordRequirement";
 import RequiredTag from "@/components/base/input/RequiredTag";
 import { hasLowercase, hasMinLength, hasNumber, hasUppercase, validatePassword, validateConfirmPassword } from "@/utils";
 
 import { toast } from "react-hot-toast";
-import { redirect } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 import dynamic from 'next/dynamic';
 
-const GoogleAuthButton = dynamic(() => import('@/components/auth/GoogleLoginButton'));
 const CredentialsButton = dynamic(() => import('@/components/auth/CredentialsButton'));
 const ValidatedInput = dynamic(() => import('@/components/base/input/ValidatedInput'));
 
 function CadastroForm() {
+  const router = useRouter(); 
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -30,11 +30,13 @@ function CadastroForm() {
     try {
       if (password !== confirmPassword) {
         toast.error("As senhas não coincidem");
+        setLoading(false);
         return;
       }
 
       if (!validatePassword(password)) {
         toast.error("A senha não atende aos requisitos mínimos");
+        setLoading(false);
         return;
       }
 
@@ -42,7 +44,7 @@ function CadastroForm() {
         name,
         email,
         password,
-        callbackURL: "/",
+        callbackURL: "/home",
       });
 
       if (result.error) {
@@ -51,20 +53,17 @@ function CadastroForm() {
         } else {
           toast.error(result.error.message || "Erro inesperado");
         }
+        setLoading(false); 
       } else {
         toast.success(`Bem-vindo(a), ${name}!`);
-        
-        setTimeout(() => {
-          redirect('/');
-        }, 1000);
+        router.push('/home'); 
+        router.refresh();
       }
     } catch (error: unknown) {
       console.error('Signup error:', error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       toast.error((error as any).message ?? "Erro inesperado");
-    } finally {
       setLoading(false);
-    }
+    } 
   };
 
   useEffect(() => {
@@ -74,22 +73,13 @@ function CadastroForm() {
   return ( 
     <div className="flex items-center justify-center">
       <div className="pt-6 mb-12 px-2">
-        <h2 className="font-bold text-[40px] text-center leading-12">Aprenda se divertindo!</h2>
-        <p className="text-gray-500 pt-1 mb-8">Lições, exercícios, simulações e muita interatividade customizados <b>da forma que você preferir</b></p>
-        
-        <GoogleAuthButton disabled={loading} text="Cadastro com Google" />
-
-        <div className="flex items-center gap-4 py-5">
-          <div className="flex-grow h-0.5 bg-gray-400" />
-          <p className="text-gray-400 text-lg">ou</p>
-          <div className="flex-grow h-0.5 bg-gray-400" />
-        </div>
+        <h2 className="font-bold text-[40px] text-center leading-12 p-2">Conecte-se com seus amigos!</h2>
 
         <form className="" onSubmit={handleCredentialsSubmit}>
           <div className="flex flex-col gap-4">
             <ValidatedInput
               title="Nome"
-              placeholder="Vagalume da Silva"
+              placeholder="Insira seu nome completo"
               name="name"
               type="text"
               value={name}
@@ -101,7 +91,7 @@ function CadastroForm() {
             ><RequiredTag/></ValidatedInput>
             <ValidatedInput
               title="E-mail"
-              placeholder="exemplo@noctiluz.com.br"
+              placeholder="exemplo@piupiwer.com.br"
               name="email"
               type="email"
               value={email}
@@ -159,10 +149,12 @@ function CadastroForm() {
               />
             </p>
           </div>
-          <CredentialsButton disabled={loading} className="mt-6">Cadastro</CredentialsButton>
+          <CredentialsButton disabled={loading} className="mt-6">
+            {loading ? "Criando conta..." : "Cadastro"}
+          </CredentialsButton>
         </form>
         
-        <Link href='/login' className="block w-fit mt-8 text-sm group">Já tem uma conta? <span className="text-pink-500 colorTransition border-b border-transparent group-hover:border-pink-500">Login</span></Link>
+        <Link href='/login' className="block w-fit mt-8 text-sm group">Já tem uma conta? <span className="text-blue-500 colorTransition border-b border-transparent group-hover:border-blue-500">Login</span></Link>
       </div>
     </div>
    );

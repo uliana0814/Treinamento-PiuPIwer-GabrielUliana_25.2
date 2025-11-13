@@ -1,30 +1,60 @@
+'use client'
 import Link from "next/link";
 import NavbarLogo from "../NavbarLogo";
-import { UserRound } from "lucide-react";
+import { LogOut, LayoutDashboard } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 function LandingPagesNav({ isLogged }: { isLogged: boolean }) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); 
+          router.refresh(); 
+        },
+      },
+    });
+  };
+
   return ( 
-    <nav className="w-full py-6 px-8
-    flex items-center justify-between">
-      <div className="text-pink-500">
+    <nav className="w-full py-6 px-8 flex items-center justify-between">
+      <div className="text-blue-500">
         <NavbarLogo isH2 />
       </div>
 
-      <ul className="flex items-center gap-4 text-xl">
+      <ul className="flex items-center gap-4 text-lg"> {/* Ajustei o texto base para text-lg */}
         {isLogged ? (
-          <li className="ml-8">
-            <Link href='/aprender' className="button-md border-pink-200 text-pink-50 bg-pink-500 flex items-center gap-2">
-              <UserRound /> Aprender
-            </Link>
-          </li>
+          <div className="flex items-center gap-4 ml-8">
+            <li>
+              <button 
+                onClick={handleLogout} 
+                className="border border-red-200 text-red-500 bg-red-50 hover:bg-red-100 flex items-center gap-2 px-4 py-2 rounded-full transition-colors text-sm font-bold cursor-pointer"
+              >
+                <LogOut size={18} /> Sair
+              </button>
+            </li>
+          </div>
         )
         : (
           <>
             <li className="ml-8">
-              <Link href='/login' className="button-md ">Entrar</Link>
+              <Link 
+                href='/login' 
+                className="px-8 py-2 rounded-full border border-black text-black font-bold hover:bg-gray-100 transition-colors"
+              >
+                Entrar
+              </Link>
             </li>
             <li>
-              <Link href='/cadastro' className="button-md border-pink-200 text-pink-50 bg-pink-500">Cadastro</Link>
+              <Link 
+                href='/cadastro' 
+                className="px-8 py-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-600 transition-colors"
+              >
+                Cadastrar
+              </Link>
             </li>
           </>
         )}

@@ -6,7 +6,7 @@ function Embarcar({ isLogged }: { isLogged: boolean }) {
   return (
     <Link
       href={isLogged ? '/aprender' : '/cadastro'}
-      className="text-pink-50 text-4xl button-lg border-pink-200 bg-pink-500 colorTransition hover:bg-pink-400"
+      className="text-blue-50 text-4xl button-lg border-blue-200 bg-blue-500 colorTransition hover:bg-blue-400"
     >
       {isLogged ? 'Continue Aprendendo' : 'Cadastro (exemplo)'}
     </Link>

@@ -11,7 +11,7 @@ function CredentialsButton({ children, className, ...props }: CredentialsButtonP
   return ( 
     <button 
       type="submit" 
-      className={cn("login-button relative text-pink-50 bg-pink-500", className)}
+      className={cn("login-button relative text-pink-50 bg-blue-500", className)}
       {...props}
     >
       <Mail className="w-[26px] h-[26px]" />

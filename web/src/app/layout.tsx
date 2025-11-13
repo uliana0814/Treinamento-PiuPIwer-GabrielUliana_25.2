@@ -9,7 +9,7 @@ const rubik = Rubik({
 })
 
 export const metadata: Metadata = {
-  title: "Noctiluz",
+  title: "PiuPiwer",
   description: "Plataforma para olimpíadas científicas e reforço escolar",
 };
 
