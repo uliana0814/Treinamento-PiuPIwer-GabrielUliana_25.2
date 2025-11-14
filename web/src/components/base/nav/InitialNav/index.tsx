@@ -25,15 +25,24 @@ function LandingPagesNav({ isLogged }: { isLogged: boolean }) {
         <NavbarLogo isH2 />
       </div>
 
-      <ul className="flex items-center gap-4 text-lg"> {/* Ajustei o texto base para text-lg */}
+      <ul className="flex items-center gap-4 text-lg">
         {isLogged ? (
           <div className="flex items-center gap-4 ml-8">
             <li>
+              <Link 
+                href='/home' 
+                className="px-6 py-2 rounded-full bg-blue-500 text-white font-bold hover:bg-blue-600 transition-colors text-base flex items-center gap-2"
+              >
+                <LayoutDashboard size={20} /> 
+                Vá para o início
+              </Link>
+            </li>
+            <li>
               <button 
                 onClick={handleLogout} 
-                className="border border-red-200 text-red-500 bg-red-50 hover:bg-red-100 flex items-center gap-2 px-4 py-2 rounded-full transition-colors text-sm font-bold cursor-pointer"
+                className="border border-red-200 text-red-500 bg-red-50 hover:bg-red-100 flex items-center gap-2 px-4 py-2 rounded-full transition-colors font-bold cursor-pointer text-base"
               >
-                <LogOut size={18} /> Sair
+                <LogOut size={20} /> Sair
               </button>
             </li>
           </div>
