@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; 
 
 import PasswordRequirement from "./PasswordRequirement";
 import RequiredTag from "@/components/base/input/RequiredTag";
@@ -30,13 +30,13 @@ function CadastroForm() {
     try {
       if (password !== confirmPassword) {
         toast.error("As senhas não coincidem");
-        setLoading(false);
+        setLoading(false); 
         return;
       }
 
       if (!validatePassword(password)) {
         toast.error("A senha não atende aos requisitos mínimos");
-        setLoading(false);
+        setLoading(false); 
         return;
       }
 
@@ -44,12 +44,12 @@ function CadastroForm() {
         name,
         email,
         password,
-        callbackURL: "/home",
+        callbackURL: "/home", 
       });
 
       if (result.error) {
         if (result.error.message?.includes('already exists') || result.error.message?.includes('duplicate')) {
-          toast.error("Este email já está cadastrado");
+          toast.error("Este email ou nome de usuário já está cadastrado");
         } else {
           toast.error(result.error.message || "Erro inesperado");
         }
@@ -61,7 +61,13 @@ function CadastroForm() {
       }
     } catch (error: unknown) {
       console.error('Signup error:', error);
-      toast.error((error as any).message ?? "Erro inesperado");
+      
+      if (error instanceof Error) {
+        toast.error(error.message ?? "Erro inesperado");
+      } else {
+        toast.error("Erro inesperado");
+      }
+
       setLoading(false);
     } 
   };
@@ -71,12 +77,13 @@ function CadastroForm() {
   }, []);
 
   return ( 
-    <div className="flex items-center justify-center bg-blue-500">
-      <div className="p-10 mb-12 bg-white rounded-3xl shadow-lg h-full m-10">
-        <h2 className="font-bold text-[40px] text-center leading-12 p-2">Conectando a comunidade Poli!</h2>
+    <div className="flex items-center justify-center">
+      <div className="pt-6 mb-12 px-2">
+        <h2 className="font-bold text-[40px] text-center leading-12 p-2">Conecte-se com seus amigos!</h2>
 
         <form className="" onSubmit={handleCredentialsSubmit}>
           <div className="flex flex-col gap-4">
+            
             <ValidatedInput
               title="Nome"
               placeholder="Insira seu nome completo"
@@ -89,6 +96,7 @@ function CadastroForm() {
               iconContainerClassName="auth-icon"
               required
             ><RequiredTag/></ValidatedInput>
+
             <ValidatedInput
               title="E-mail"
               placeholder="exemplo@piupiwer.com.br"
@@ -101,6 +109,7 @@ function CadastroForm() {
               iconContainerClassName="auth-icon"
               required
             ><RequiredTag/></ValidatedInput>
+            
             <ValidatedInput
               title="Senha"
               placeholder="Insira sua senha"
@@ -114,6 +123,7 @@ function CadastroForm() {
               iconContainerClassName="auth-icon"
               required
             ><RequiredTag/></ValidatedInput>
+
             <ValidatedInput
               title="Confirmar Senha"
               placeholder="Confirme sua senha"
@@ -128,9 +138,9 @@ function CadastroForm() {
               iconContainerClassName="auth-icon"
               required
             ><RequiredTag/></ValidatedInput>
+            
             <p>
               Senha deve ter pelo menos:
-              
               <PasswordRequirement 
                 text="1 letra maiúscula"
                 validateFunction={() => hasUppercase(password)}
@@ -150,7 +160,7 @@ function CadastroForm() {
             </p>
           </div>
           <CredentialsButton disabled={loading} className="mt-6">
-            {loading ? "Criando conta..." : "Cadastro"}
+            {loading ? "Criando conta..." : "Cadastrar"}
           </CredentialsButton>
         </form>
         
