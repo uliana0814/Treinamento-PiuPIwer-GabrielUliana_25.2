@@ -66,7 +66,6 @@ model User {
   accounts      Account[]
   role          Role      @default(USER)
   // < e aqui
-
   // Social media fields
   dateOfBirth   DateTime?
   location      String?   // City

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 function NavbarLogo({ isH2 }: { isH2?: boolean }) {
   return ( 
-    <Link className="flex items-center gap-2" href="/">
+    <Link className="flex items-center gap-4" href="/">
       <Image 
         src={PiuPiwer} 
         alt="Logo PiuPiwer" 

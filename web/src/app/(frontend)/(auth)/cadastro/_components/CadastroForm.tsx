@@ -71,9 +71,9 @@ function CadastroForm() {
   }, []);
 
   return ( 
-    <div className="flex items-center justify-center">
-      <div className="pt-6 mb-12 px-2">
-        <h2 className="font-bold text-[40px] text-center leading-12 p-2">Conecte-se com seus amigos!</h2>
+    <div className="flex items-center justify-center bg-blue-500">
+      <div className="p-10 mb-12 bg-white rounded-3xl shadow-lg h-full m-10">
+        <h2 className="font-bold text-[40px] text-center leading-12 p-2">Conectando a comunidade Poli!</h2>
 
         <form className="" onSubmit={handleCredentialsSubmit}>
           <div className="flex flex-col gap-4">

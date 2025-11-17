@@ -65,7 +65,7 @@ export default function ProfilePage() {
   return (
     <div className="max-w-[900px] mx-auto pb-10">
       
-      <div className="h-40 w-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-t-2xl shadow-sm">
+      <div className="h-40 w-full bg-linear-to-r from-blue-400 to-blue-600 rounded-t-2xl shadow-sm">
       </div>
 
       <div className="bg-white rounded-b-2xl p-6 shadow-sm border border-t-0 border-slate-100 mb-6">
