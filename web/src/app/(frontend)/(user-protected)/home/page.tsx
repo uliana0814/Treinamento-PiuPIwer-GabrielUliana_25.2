@@ -1,27 +1,30 @@
-import HomeCaroussel from "./HomeCaroussel"; 
+import HomeCaroussel from "./HomeCaroussel";// (Verifique o caminho/nome deste arquivo)
 import { CreatePost } from "@/components/ui/CreatePost";
 import { PostCard } from "@/components/ui/PostCard";
-import { headers, cookies } from "next/headers"; 
+import { cookies } from "next/headers"; // Para passar a autenticação
 
+// 1. TIPO ATUALIZADO (para corresponder ao seu 'services/posts.ts')
 type ApiPost = {
   id: string;
   text: string;
-  createdAt: string;
+  createdAt: string; // O Prisma devolve como string de data
   author: {
     id: string;
     name: string;
     username: string | null;
     image: string | null;
   };
-  likes: unknown[]; 
-  comments: unknown[]; 
+  _count: { // O seu backend envia _count
+    likes: number;
+    comments: number;
+  }
 }
 
-function formatTimeAgo(dateString: string) {
+// (Função formatTimeAgo)
+function formatTimeAgo(dateString: string | Date) {
   const date = new Date(dateString);
   const now = new Date();
   const seconds = Math.round((now.getTime() - date.getTime()) / 1000);
-  
   if (seconds < 60) return `${seconds}s`;
   const minutes = Math.round(seconds / 60);
   if (minutes < 60) return `${minutes}m`;
@@ -31,12 +34,13 @@ function formatTimeAgo(dateString: string) {
   return `${days}d`;
 }
 
+// 2. FUNÇÃO getPosts CORRIGIDA
 async function getPosts() {
   try {
     const host = process.env.BETTER_AUTH_URL || "http://localhost:3000";
     
+    // 3. CORREÇÃO do 'await' (o erro de Promise que vimos)
     const cookieStore = await cookies(); 
-    
     const sessionCookie = cookieStore.get('better-auth.session-token'); 
     
     const fetchHeaders = new Headers();
@@ -47,17 +51,17 @@ async function getPosts() {
     const res = await fetch(`${host}/api/posts`, {
       method: 'GET',
       headers: fetchHeaders, 
-      cache: 'no-store', 
+      cache: 'no-store', // Essencial para o feed atualizar
     });
 
     if (!res.ok) {
-      console.error("Erro ao buscar posts (status):", res.status, res.statusText);
       throw new Error('Falha ao buscar posts');
     }
 
     const data = await res.json();
-
-    return data as ApiPost[]; 
+    
+    // 4. CORREÇÃO da resposta (o seu backend devolve data.posts)
+    return data.posts as ApiPost[]; 
   
   } catch (error) {
     console.error("Erro detalhado ao buscar posts:", error);
@@ -65,6 +69,7 @@ async function getPosts() {
   }
 }
 
+// --- A PÁGINA ---
 export default async function FeedPage() {
   const posts = await getPosts();
 
@@ -73,7 +78,7 @@ export default async function FeedPage() {
       
       <div className="mb-8">
         <h2 className="text-xl font-bold text-slate-800 mb-4">Destaques</h2>
-        <HomeCaroussel />
+        <HomeCaroussel /> 
       </div>
 
       <CreatePost />
@@ -85,17 +90,18 @@ export default async function FeedPage() {
             <PostCard 
               key={post.id}
               author={post.author.name}
-              handle={post.author.username ?? ''} 
+              handle={post.author.username ?? ''} // Agora o 'username' existe!
               time={formatTimeAgo(post.createdAt)}
-              content={post.text} 
-              likes={post.likes.length} 
-              comments={post.comments.length} 
-              avatarUrl={post.author.image}
+              content={post.text}
+              // 5. CORREÇÃO da contagem (usando _count)
+              likes={post._count.likes} 
+              comments={post._count.comments} 
+              avatarUrl={post.author.image} 
             />
           ))
         ) : (
           <div className="text-center text-slate-500 py-10">
-            <p>Seu feed está vazio. Siga alguém ou faça seu primeiro post!</p>
+            <p>Seu feed está vazio. Faça seu primeiro post!</p>
           </div>
         )}
       </div>

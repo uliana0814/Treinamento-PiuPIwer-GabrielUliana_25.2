@@ -1,16 +1,16 @@
-"use client" // <--- PRECISA SER CLIENT COMPONENT
+"use client" 
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Para atualizar o feed
+import { useRouter } from "next/navigation"; 
 import { Image as ImageIcon, Send } from "lucide-react";
-import { Button } from "@/components/ui/button"; // Reutilizando seu botão
-import { Textarea } from "@/components/ui/TextArea"; // Reutilizando o Textarea que criamos
-import toast from "react-hot-toast"; // Para dar feedback
+import { Button } from "@/components/ui/button"; 
+import { Textarea } from "@/components/ui/TextArea";
+import toast from "react-hot-toast"; 
 
 export function CreatePost() {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter(); // Hook para atualizar a página
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (content.trim().length < 3) {
@@ -26,23 +26,19 @@ export function CreatePost() {
         headers: {
           "Content-Type": "application/json",
         },
-        // O browser anexa o cookie de autenticação automaticamente
         body: JSON.stringify({
-          text: content, // O seu .bru disse que o corpo é { "text": "..." }
-          // "imageUrl" é opcional, então não enviamos por enquanto
+          text: content, 
         }),
       });
 
       if (!res.ok) {
-         // Tenta ler a mensagem de erro do backend
         const errorData = await res.json().catch(() => ({ message: "Falha ao criar o post." }));
         throw new Error(errorData.message || "Falha ao criar o post.");
       }
 
-      // 2. Se deu certo
       toast.success("Post publicado!");
-      setContent(""); // Limpa o campo de texto
-      router.refresh(); // <--- ATUALIZA O FEED (re-roda o getPosts da página)
+      setContent("");
+      router.refresh();
 
     } catch (error) {
       console.error(error);
@@ -67,7 +63,7 @@ export function CreatePost() {
         
         <Button 
           variant="outline"
-          className="text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 font-medium text-sm"
+          className="text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 font-medium text-sm cursor-pointer"
           disabled={isLoading}
         >
           <ImageIcon size={18} />
@@ -76,9 +72,9 @@ export function CreatePost() {
 
         <Button 
           variant="default" 
-          className="font-bold text-sm shadow-md shadow-blue-200"
-          onClick={handleSubmit} // <--- CHAMA A FUNÇÃO
-          disabled={isLoading} // <--- Desativa enquanto envia
+          className="font-bold text-sm shadow-md shadow-blue-200 cursor-pointer"
+          onClick={handleSubmit}
+          disabled={isLoading}
         >
           {isLoading ? "Publicando..." : "Publicar"} 
           {!isLoading && <Send size={16} />}

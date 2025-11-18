@@ -21,7 +21,7 @@ export default async function Home() {
           PiuPiwer
         </h1>
         <p className="pt-6 text-xl md:text-2xl text-slate-600 max-w-2xl">
-          Conecte-se com seus amigos e veja o que está acontecendo no mundo agora.
+         Conectando a comunidade Poli!
         </p>
       </main>
 
