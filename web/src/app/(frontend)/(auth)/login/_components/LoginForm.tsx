@@ -1,20 +1,19 @@
 'use client'
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation" //
 
 import LoginOptionals from "@/components/auth/LoginOptionals";
-
 import RequiredTag from "@/components/base/input/RequiredTag";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
-
 import dynamic from 'next/dynamic';
 
-const GoogleAuthButton = dynamic(() => import('@/components/auth/GoogleLoginButton'));
 const CredentialsButton = dynamic(() => import('@/components/auth/CredentialsButton'));
 const ValidatedInput = dynamic(() => import('@/components/base/input/ValidatedInput'));
 
 function LoginForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,26 +30,32 @@ function LoginForm() {
       const result = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/",
+        callbackURL: "/home",
+      }, {
+        onSuccess: () => {
+            toast.success("Login realizado!");
+            router.push("/home"); 
+            router.refresh(); 
+        },
+        onError: (ctx) => {
+            toast.error(ctx.error.message || "Erro ao fazer login");
+            setLoading(false); 
+        }
       });
 
-      if (result.error) {
-        toast.error((result.error?.message || 'Erro desconhecido'))
-      }
     } catch (error) {
       toast.error('Erro: ' + String(error))
-    } finally {
       setLoading(false);
     }
   };
 
   return ( 
     <div className="lg:w-[90%] xl:w-[80%]">
-      <h2 className="font-bold text-[40px] text-center leading-12">Continue seu aprendizado</h2>
+      <h2 className="font-bold text-[40px] text-center leading-12">Entre para ver o que seus amigos estão pensando!</h2>
       <form className="mt-6" onSubmit={handleSubmit}>
         <ValidatedInput 
           title="E-mail"
-          placeholder="exemplo@noctiluz.com.br"
+          placeholder="exemplo@piupiwer.com.br"
           name="email"
           type="email"
           value={email}
@@ -68,9 +73,7 @@ function LoginForm() {
           type="password"
           value={password}
           setValue={setPassword}
-
           overrideValidate={(val) => val.length >= 6}
-
           containerClassName="mt-4"
           labelClassName="auth-label"
           inputClassName="auth-input"
@@ -89,9 +92,7 @@ function LoginForm() {
         <div className="flex-grow h-0.5 bg-gray-400" />
       </div>
 
-      <GoogleAuthButton disabled={loading} text="Entrar com Google" />
-
-      <Link href='/cadastro' className="block w-fit mt-8 text-sm group">Ainda não tem uma conta? <span className="text-pink-500 colorTransition border-b border-transparent group-hover:border-pink-500">Cadastre-se</span></Link>
+      <Link href='/cadastro' className="block w-fit mt-8 text-sm group">Ainda não tem uma conta? <span className="text-blue-500 colorTransition border-b border-transparent group-hover:border-blue-500">Cadastre-se</span></Link>
     </div>
    );
 }

@@ -1,8 +1,8 @@
 import LandingPagesNav from "@/components/base/nav/InitialNav";
-import Embarcar from "./_components/Embarcar";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
 import CarouselExample from "./_components/CarouselExample";
+import PiuPiwer from '@/components/svgs/piupiwer.png'
 
 export default async function Home() {
   const session = await auth.api.getSession({
@@ -12,20 +12,25 @@ export default async function Home() {
   const isLogged = !!session?.user;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-50">
       <LandingPagesNav isLogged={isLogged} />
       
-      <main className="h-[70vh] w-full pt-20 pb-16 flex flex-col items-center justify-center text-center">
-        <h1 className="font-bold text-5xl text-pink-800">Página de Exemplo</h1>
-        <p className="pt-4 text-xl">Comece a editar seu site em <em className="text-pink-400">/app/(frontend)/(landing-pages)/page.tsx</em></p>
+      <main className="w-full pt-32 pb-20 flex flex-col items-center justify-center text-center px-4 bg-blue-50">
+        <img src={PiuPiwer.src} alt="PiuPiwer Logo" className="w-32 h-32 mb-6" />
+        <h1 className="font-extrabold text-6xl md:text-7xl text-blue-600 tracking-tight">
+          PiuPiwer
+        </h1>
+        <p className="pt-6 text-xl md:text-2xl text-slate-600 max-w-2xl">
+         Conectando a comunidade Poli!
+        </p>
       </main>
 
-      <div className="w-full flex items-center justify-center">
-        <Embarcar isLogged={isLogged} />
+      <div className="py-16 w-full flex flex-col items-center justify-center bg-blue-50 border-t border-slate-100">
+        <h2 className="text-3xl font-semibold text-slate-800">
+          Destaques da Comunidade
+        </h2>
+        <CarouselExample />
       </div>
-
-      <p className="text-center pt-8">um carousel de exemplo :)</p>
-      <CarouselExample />
     </div>
   );
 }
