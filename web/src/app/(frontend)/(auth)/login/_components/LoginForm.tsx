@@ -18,8 +18,7 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    setLoading(false);
+  useEffect(() => {    setLoading(false);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +50,7 @@ function LoginForm() {
 
   return ( 
     <div className="lg:w-[90%] xl:w-[80%]">
-      <h2 className="font-bold text-[40px] text-center leading-12">Entre para ver o que seus amigos estão pensando!</h2>
+      <h2 className="font-bold text-[40px] text-center leading-12">Conectando a comunidade Poli!</h2>
       <form className="mt-6" onSubmit={handleSubmit}>
         <ValidatedInput 
           title="E-mail"
