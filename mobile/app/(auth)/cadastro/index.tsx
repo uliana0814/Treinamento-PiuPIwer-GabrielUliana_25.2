@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { 
-  View,
-  Image, 
+  View, 
   Text, 
   TextInput, 
   TouchableOpacity, 
@@ -9,7 +8,8 @@ import {
   ActivityIndicator, 
   ScrollView, 
   KeyboardAvoidingView, 
-  Platform 
+  Platform,
+  Image
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "~/contexts/AuthContext";
@@ -54,7 +54,10 @@ export default function CadastroScreen() {
          Alert.alert("Erro no Cadastro", result.error);
       } else {
          Alert.alert("Sucesso", `Bem-vindo(a), ${name}!`, [
-            { text: "OK", onPress: () => router.replace("/login") }
+            { 
+              text: "Ir para Home", 
+              onPress: () => router.replace("/home")
+            } 
          ]);
       }
     } catch (error) {
@@ -85,14 +88,15 @@ export default function CadastroScreen() {
           
           <Image 
             source={require("../../../assets/icon.png")} 
-            style={{ width: 48, height: 48, marginBottom: 16 }} 
-            resizeMode="contain"
+          style={{ width: 48, height: 48, marginBottom: 16 }} 
+          resizeMode="contain"
           />
+
           <Text className="font-bold text-3xl text-center text-slate-900 mb-8">
             Conectando a comunidade Poli!
           </Text>
-          
-          <View className="space-y-4">
+
+          <View className="space-y-4 w-full">
             
             <View>
               <Text className="text-slate-700 font-semibold mb-1 ml-1">Nome</Text>
@@ -142,7 +146,7 @@ export default function CadastroScreen() {
               />
             </View>
 
-            <View className="mt-2 p-3 bg-gray-50 rounded-lg">
+            <View className="mt-2 p-3 bg-gray-50 rounded-lg w-full">
               <Text className="text-xs text-gray-500 mb-2 font-bold uppercase">A senha deve ter:</Text>
               <RequirementItem fulfilled={hasUpperCase} text="1 letra maiúscula" />
               <RequirementItem fulfilled={hasLowerCase} text="1 letra minúscula" />

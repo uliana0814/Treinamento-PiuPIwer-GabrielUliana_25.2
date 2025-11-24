@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "./auth";
 import type { Role } from "./generated/prisma";
 
-// Configuration for different page types
+// --- CONFIGURAÇÃO DAS ROTAS (MANTIDA) ---
 const ROUTE_CONFIG = {
   authRequired: [
     "/aprender",
@@ -11,24 +11,19 @@ const ROUTE_CONFIG = {
     "/perfil",
     "/settings",
   ],
-  
-  // Pages that require ADMIN or SUPER_ADMIN role
   adminRequired: [
     "/admin/**",
   ],
-  
   redirectIfAuth: [
     "/login",
     "/cadastro",
   ],
-  
-  // Special routes with custom logic
   specialRoutes: [
-    "/admin", // Special handling for /admin route
+    "/admin",
   ]
 };
 
-// Helper function to check if path matches any pattern
+// --- HELPERS (MANTIDOS) ---
 function matchesAnyPattern(pathname: string, patterns: string[]): boolean {
   return patterns.some(pattern => {
     if (pattern.endsWith('**')) {
@@ -46,7 +41,39 @@ function hasRequiredRole(userRole: Role | undefined, requiredRoles: Role[]): boo
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ==================================================================
+  // 1. LÓGICA DE CORS (NOVA - Para o Mobile funcionar)
+  // ==================================================================
   
+  // Define os headers de CORS
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version",
+    "Access-Control-Allow-Credentials": "true",
+  };
+
+  // Se for uma rota de API (usada pelo mobile), tratamos o CORS primeiro
+  if (pathname.startsWith("/api")) {
+    // Trata requisição de Preflight (OPTIONS)
+    if (request.method === "OPTIONS") {
+      return NextResponse.json({}, { headers: corsHeaders });
+    }
+
+    // Para requisições normais da API, deixamos passar e adicionamos os headers
+    const response = NextResponse.next();
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+    return response;
+  }
+
+  // ==================================================================
+  // 2. LÓGICA DE PROTEÇÃO DE PÁGINAS (SUA LÓGICA EXISTENTE)
+  // Só roda se NÃO for rota de API (para não quebrar o app com redirects HTML)
+  // ==================================================================
+
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -61,15 +88,12 @@ export async function middleware(request: NextRequest) {
     }
     
     if (hasRequiredRole(userRole, ["ADMIN", "SUPER_ADMIN"])) {
-      // Redirect admin users to dashboard
       return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     } else {
-      // Redirect non-admin authenticated users to home
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
-  
   if (matchesAnyPattern(pathname, ROUTE_CONFIG.redirectIfAuth)) {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL("/aprender", request.url));
@@ -102,6 +126,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   runtime: "nodejs",
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 };

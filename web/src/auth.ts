@@ -64,5 +64,8 @@ export const auth = betterAuth({
     trustedOrigins: [
         "noctiluz://",
         "noctiluz://*",
+        "http://localhost:3000",
+        "http://localhost:8081",
+        "exp://",
     ]
 });

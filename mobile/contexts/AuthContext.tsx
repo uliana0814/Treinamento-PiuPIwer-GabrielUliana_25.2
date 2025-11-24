@@ -7,11 +7,21 @@ interface User {
   id: string
   email: string
   name: string
-  // Add other user properties as needed
+  image?: string | null
+}
+
+interface Session {
+  id: string
+  userId: string
+  token: string
+  expiresAt: Date
+  ipAddress?: string | null | undefined
+  userAgent?: string | null | undefined
 }
 
 interface AuthContextType {
   user: User | null
+  session: Session | null
   isLoading: boolean
   isAuthenticated: boolean
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
@@ -25,29 +35,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const segments = useSegments()
 
   const isAuthenticated = !!user
 
-  // Check session on app start
   useEffect(() => {
     checkSession()
   }, [])
 
-  // Handle navigation based on auth state
   useEffect(() => {
     if (isLoading) return
 
     const inAuthGroup = segments[0] === '(auth)'
 
     if (!isAuthenticated && !inAuthGroup) {
-      // User not authenticated, redirect to login
-      router.replace('/(auth)/login')
+      router.replace('/login')
     } else if (isAuthenticated && inAuthGroup) {
-      // User authenticated, redirect to main app
-      router.replace('/')
+      router.replace('/home')
     }
   }, [isAuthenticated, segments, isLoading, router])
 
@@ -55,14 +62,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const result = await authClient.getSession()
       
-      if (result?.data?.user) {
+      if (result?.data) {
         setUser(result.data.user)
+        setSession(result.data.session) 
       } else {
         setUser(null)
+        setSession(null)
       }
     } catch (error) {
       console.error('Error checking session:', error)
       setUser(null)
+      setSession(null)
     } finally {
       setIsLoading(false)
     }
@@ -78,18 +88,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
       })
-      console.log(result)
       
       if (result.error) {
         return { success: false, error: result.error.message }
       }
       
-      if (result.data?.user) {
-        setUser(result.data.user)
-        return { success: true }
-      }
+      await checkSession() 
       
-      return { success: false, error: 'Login failed' }
+      return { success: true }
     } catch (error) {
       console.error('Login error:', error)
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
@@ -109,12 +115,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: result.error.message }
       }
       
-      if (result.data?.user) {
-        setUser(result.data.user)
-        return { success: true }
-      }
+      await checkSession()
       
-      return { success: false, error: 'Sign up failed' }
+      return { success: true }
     } catch (error) {
       console.error('Sign up error:', error)
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
@@ -133,7 +136,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: false, error: result.error.message }
       }
       
-      // For social login, we might need to check session after redirect
       await checkSession()
       return { success: true }
     } catch (error) {
@@ -147,16 +149,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authClient.signOut()
       setUser(null)
+      setSession(null)
     } catch (error) {
       console.error('Sign out error:', error)
-      // Even if the API call fails, clear the local user state
       setUser(null)
+      setSession(null)
     }
   }
 
   return (
     <AuthContext.Provider value={{
       user,
+      session,
       isLoading,
       isAuthenticated,
       signIn,

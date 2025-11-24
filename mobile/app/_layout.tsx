@@ -1,10 +1,31 @@
-import '../global.css';
+import "../global.css";
+import { Slot, SplashScreen } from "expo-router";
+import { AuthProvider, useAuth } from "~/contexts/AuthContext";
+import { useEffect } from "react";
+import { View, ActivityIndicator } from "react-native";
 
-import { Stack } from 'expo-router';
-import { AuthProvider } from '~/contexts/AuthContext';
+SplashScreen.preventAutoHideAsync();
 
-export default function Layout() {
-  return <AuthProvider>
-    <Stack screenOptions={{ headerShown: false }} />
-  </AuthProvider>;
+function RootContent() {
+  const { isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
+    return null;
+  }
+
+  return <Slot />;
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootContent />
+    </AuthProvider>
+  );
 }
