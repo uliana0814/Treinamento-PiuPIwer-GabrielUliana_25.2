@@ -7,7 +7,8 @@ import {
   TouchableOpacity, 
   ActivityIndicator, 
   RefreshControl,
-  Alert
+  Alert,
+  Platform
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "~/contexts/AuthContext";
@@ -42,9 +43,8 @@ type UserPost = {
   };
 }
 
-const API_URL = "http://localhost:3000"; 
+const API_URL = "http://192.168.15.10:3000"; 
 
-// --- FUNÇÃO DE TEMPO ---
 function formatTimeAgo(dateString: string | Date) {
   const date = new Date(dateString);
   const now = new Date();
@@ -69,7 +69,7 @@ const StatCard = ({ title, value, iconName }: { title: string, value: string | n
 );
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user, session, signOut } = useAuth(); 
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [userPosts, setUserPosts] = useState<UserPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,44 +78,53 @@ export default function ProfileScreen() {
   const fetchProfileData = useCallback(async () => {
     if (!user?.id) return;
 
+    if (!session?.token) {
+        console.log("Aguardando token de sessão...");
+        return; 
+    }
+
     try {
       if (!refreshing) setLoading(true);
+
+      const authHeaders = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': 'http://192.168.15.10:3000', 
+        'Cookie': `better-auth.session_token=${session.token}`
+      };
 
       const profileEndpoint = `${API_URL}/api/users/${user.id}`;
       console.log("Buscando perfil em:", profileEndpoint);
 
       const resProfile = await fetch(profileEndpoint, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', 
+        headers: authHeaders,
+        credentials: 'include'
       });
-
-      let currentProfile: ProfileData;
 
       if (resProfile.ok) {
         const data = await resProfile.json();
-        currentProfile = data;
         setProfileData(data); 
       } else {
-        console.error("Erro ao buscar perfil:", resProfile.status);
-        currentProfile = {
+        const errorText = await resProfile.text().catch(() => "Sem detalhes");
+        console.warn(`ERRO API PERFIL (${resProfile.status}):`, errorText);
+        
+        setProfileData({
             id: user.id,
             name: user.name || "Usuário",
             image: user.image || null,
-            location: "Localização não definida",
+            location: "Brasil",
             createdAt: new Date().toISOString(),
             _count: { posts: 0, followers: 0, following: 0 }
-        };
-        setProfileData(currentProfile);
+        });
       }
 
       const postsEndpoint = `${API_URL}/api/users/${user.id}/posts`; 
-      console.log("Buscando posts em:", postsEndpoint);
-
+      
       const resPosts = await fetch(postsEndpoint, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', 
+        headers: authHeaders,
+        credentials: 'include'
       });
       
       if (resPosts.ok) {
@@ -128,16 +137,16 @@ export default function ProfileScreen() {
             _count: { ...prev._count, posts: posts.length }
         }) : null);
       } else {
-        console.error("Erro ao buscar posts:", resPosts.status);
+        console.error(`Erro Posts (${resPosts.status})`);
       }
 
     } catch (error) {
-      console.error("Erro geral no perfil:", error);
+      console.error("Erro de conexão:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [refreshing, user?.id]);
+  }, [refreshing, user?.id, session?.token]);
 
   useEffect(() => {
     fetchProfileData();
@@ -189,7 +198,7 @@ export default function ProfileScreen() {
               <View className="h-32 w-full bg-blue-500 rounded-b-3xl relative">
                  <TouchableOpacity 
                     onPress={signOut}
-                    className="absolute top-4 right-4 bg-white/20 p-2 rounded-full"
+                    className="absolute top-4 right-4 bg-white/20 p-2 rounded-full z-10"
                  >
                     <Feather name="log-out" size={20} color="white" />
                  </TouchableOpacity>
@@ -197,7 +206,6 @@ export default function ProfileScreen() {
 
               <View className="px-4">
                 <View className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 -mt-12 mb-6">
-                  
                   <View className="flex-row justify-between items-start">
                     <View className="-mt-10">
                       <Image 
@@ -205,10 +213,12 @@ export default function ProfileScreen() {
                         className="w-24 h-24 rounded-full border-4 border-white bg-gray-200"
                       />
                     </View>
-                    
                     <TouchableOpacity 
                       className="mt-2 border border-gray-300 px-3 py-1.5 rounded-full flex-row items-center"
-                      onPress={() => Alert.alert("Editar", "Funcionalidade em breve!")}
+                      onPress={() => {
+                        if(Platform.OS === 'web') window.alert("Em breve!");
+                        else Alert.alert("Editar", "Em breve!");
+                      }}
                     >
                       <Feather name="edit-2" size={14} color="#475569" />
                       <Text className="text-slate-600 text-xs font-bold ml-1">Editar</Text>
@@ -222,10 +232,10 @@ export default function ProfileScreen() {
 
                   <View className="flex-row flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100">
                     {profileData?.location && (
-                      <View className="flex-row items-center">
+                        <View className="flex-row items-center">
                         <Feather name="map-pin" size={14} color="#94a3b8" />
                         <Text className="text-slate-500 text-xs ml-1">{profileData.location}</Text>
-                      </View>
+                        </View>
                     )}
                     <View className="flex-row items-center">
                       <Feather name="calendar" size={14} color="#94a3b8" />
@@ -245,7 +255,7 @@ export default function ProfileScreen() {
                   <StatCard title="Posts" value={profileData?._count.posts || 0} iconName="file-text" />
                   <StatCard title="Seguidores" value={profileData?._count.followers || 0} iconName="users" />
                   <StatCard title="Seguindo" value={profileData?._count.following || 0} iconName="user-check" />
-                  <StatCard title="Engajamento" value="High" iconName="activity" />
+                  <StatCard title="Engajamento" value="-" iconName="activity" />
                 </View>
 
                 <Text className="text-xl font-bold text-slate-800 mb-4">Seus Posts</Text>
@@ -258,12 +268,6 @@ export default function ProfileScreen() {
               <Text className="text-gray-500 text-center mb-4">
                 Você ainda não fez nenhum post.
               </Text>
-              <TouchableOpacity 
-                onPress={() => onRefresh()} 
-                className="bg-blue-50 px-4 py-2 rounded-full"
-              >
-                <Text className="text-blue-500 font-bold text-sm">Atualizar</Text>
-              </TouchableOpacity>
             </View>
           )}
 

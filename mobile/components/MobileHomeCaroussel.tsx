@@ -2,22 +2,22 @@ import { View, Text, Image, FlatList, Dimensions, TouchableOpacity } from "react
 
 const newsItems = [
   {
-    category: "Tecnologia",
-    title: "Nova atualização traz recursos inovadores",
-    description: "Confira as novidades que chegaram hoje na plataforma.",
-    imageUrl: "https://placehold.co/1200x500/1E293B/E2E8F0?text=Notícia+1", 
+    category: "Entretenimento",
+    title: "Lá vem festa!",
+    description: "Festa de celebração de 10M de faturamento vem aí!",
+    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT789I3S1dy7-EH1r0mU30HpAmKtv_FPmoPfA&s1", 
   },
   {
     category: "Esportes",
-    title: "Final do campeonato é definida",
-    description: "Times se preparam para o grande confronto no próximo fim de semana.",
-    imageUrl: "https://placehold.co/1200x500/166534/E2E8F0?text=Notícia+2",
+    title: "Sábado é guerra!",
+    description: "Mengão se prepara para decisão.",
+    imageUrl: "https://s2-oglobo.glbimg.com/IyxzE2syOh_33DkoU4_kZl_8bPw=/540x304/top/smart/https://i.s3.glbimg.com/v1/AUTH_da025474c0c44edd99332dddb09cabe8/internal_photos/bs/2025/Z/s/oAHST3Q6A1PHzO48OXbg/113101478-es-rio-de-janeiro-rj-22-11-2025-campeonato-brasileiro-2025-35a-rodada.-flame.jpg",
   },
   {
-    category: "Comunidade",
-    title: "PiuPiwer celebra 1 milhão de usuários!",
-    description: "Nossa comunidade atingiu uma nova marca histórica esta semana.",
-    imageUrl: "https://placehold.co/1200x500/0891B2/E2E8F0?text=Notícia+3",
+    category: "Mundo coorporativo",
+    title: "Poli Júnior alcança 10M de faturamento!",
+    description: "Por mais um ano, a maior EJ do Brasil alcança marca histórica.",
+    imageUrl: "https://polijunior.com.br/wp-content/uploads/2024/02/Logo-Poli-Site.jpeg",
   }
 ];
 
