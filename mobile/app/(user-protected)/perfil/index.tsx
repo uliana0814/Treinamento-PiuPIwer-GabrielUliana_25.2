@@ -43,7 +43,7 @@ type UserPost = {
   };
 }
 
-const API_URL = "http://192.168.15.10:3000"; 
+const API_URL = "http://192.168.15.9:3000"; 
 
 function formatTimeAgo(dateString: string | Date) {
   const date = new Date(dateString);
@@ -89,7 +89,7 @@ export default function ProfileScreen() {
       const authHeaders = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Origin': 'http://192.168.15.10:3000', 
+        'Origin': 'http://192.168.15.9:3000', 
         'Cookie': `better-auth.session_token=${session.token}`
       };
 

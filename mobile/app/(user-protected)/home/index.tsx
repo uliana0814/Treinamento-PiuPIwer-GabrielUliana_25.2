@@ -9,7 +9,6 @@ import {
 
 import { useAuth } from "~/contexts/AuthContext"; 
 
-// Imports dos Componentes
 import MobileHomeCarousel from "~/components/MobileHomeCaroussel"; 
 import { CreatePost } from "~/components/CreatePost"; 
 import { PostCard } from "~/components/MobilePostCard";
@@ -30,7 +29,7 @@ type ApiPost = {
   }
 };
 
-const API_URL = "http://192.168.15.10:3000"; 
+const API_URL = "http://192.168.15.9:3000"; 
 
 function formatTimeAgo(dateString: string | Date) {
   const date = new Date(dateString);
